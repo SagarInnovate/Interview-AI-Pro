@@ -1,9 +1,10 @@
 import axios from 'axios';
 
 // Create axios instance with base URL and credentials
+// Ensure axios is configured to send credentials
 const apiClient = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || '/api',
-  withCredentials: true, // Important for cookies/session
+  baseURL: '/api', // Use relative path in production
+  withCredentials: true, // MUST be true
   headers: {
     'Content-Type': 'application/json'
   }
