@@ -1,0 +1,74 @@
+# Dependencies
+/node_modules
+/client/node_modules
+/server/node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+/client/coverage
+
+# Production build files
+# /client/build
+# /build
+# /dist
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.production
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Uploaded files
+/public/Resumes/*
+!/public/Resumes/.gitkeep
+
+# Database
+/data
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+
+# Cache
+.eslintcache
+.cache
+.parcel-cache
+
+# Misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.vercel
+.next
+
+# Debug
+.debugger
+
+*.zip
