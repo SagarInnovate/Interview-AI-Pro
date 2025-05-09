@@ -12,7 +12,9 @@ const app = express();
 
 // CORS setup
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? false : ['http://localhost:3000'],
+  origin: process.env.NODE_ENV === 'production' 
+    ? 'https://interview-ai-pro.onrender.com' // Use your actual domain
+    : 'http://localhost:3000',
   credentials: true
 }));
 
