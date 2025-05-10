@@ -1,8 +1,9 @@
 const express = require('express');
 const path = require('path');
-const session = require('cookie-session');
+const cookieSession = require('cookie-session');
 const rateLimit = require('express-rate-limit');
 const cors = require('cors');
+const connectDB = require('./config/dbConfig');
 require('dotenv').config();
 
 // Import routes
@@ -10,13 +11,18 @@ const apiRoutes = require('./routes/api');
 
 const app = express();
 
+// Connect to MongoDB
+connectDB();
+
+// Trust proxy - CRITICAL for cookies in production
+app.set('trust proxy', 1);
+
 // CORS setup
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? 'https://interview-ai-pro.onrender.com' // Use your actual domain
-    : 'http://localhost:3000',
-  credentials: true
-}));
+// app.use(cors({
+//   origin: process.env.NODE_ENV === 'production' ? true : 'http://localhost:3000',
+//   credentials: true,
+//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+// }));
 
 // Configure rate limiters
 const apiLimiter = rateLimit({
@@ -28,22 +34,28 @@ const apiLimiter = rateLimit({
   skip: (req) => req.session && req.session.admin === true // Skip for admins
 });
 
-// Session middleware
-// Session middleware
+// Middleware to parse JSON and form data
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Session middleware - CORRECT PRODUCTION SETTINGS
 app.use(
-  session({
+  cookieSession({
     name: 'interview-pro-session',
     keys: [process.env.SESSION_SECRET || 'interviewAppSecret'],
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    sameSite:'lax'
   })
 );
 
-// Middleware to parse JSON and form data
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Debug middleware - REMOVE IN PRODUCTION
+app.use((req, res, next) => {
+  console.log('Session data:', req.session);
+  console.log('Cookie header:', req.headers.cookie);
+  next();
+});
 
 // Apply rate limiting to API routes
 app.use('/api/', apiLimiter);
@@ -52,7 +64,7 @@ app.use('/api/', apiLimiter);
 app.use('/api', apiRoutes);
 
 // Serve static assets if in production
-if (process.env.NODE_ENV === 'production') {
+
   // Set static folder
   app.use(express.static(path.join(__dirname, '../client/build')));
 
@@ -60,7 +72,6 @@ if (process.env.NODE_ENV === 'production') {
   app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
   });
-}
 
 // Global error handler
 app.use((err, req, res, next) => {
